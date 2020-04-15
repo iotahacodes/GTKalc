@@ -13,7 +13,6 @@ GtkTextBuffer *buffer;
 
 size_t strchrcount(char *string, char search)
 {
-	//Function for counting the specified character from the string
 	size_t count = 0;
 	while (*string != 0)
 	{
@@ -22,13 +21,10 @@ size_t strchrcount(char *string, char search)
 		string++;
 	}
 	return count;
-	//P.S. :D
-	//while ((string = 1 + strchr(string, search))-1 != NULL) count++;
 }
 
 void strcharsreplace(char *string, char character, char replace_to)
 {
-	//The strcharsreplace() function replaces all characters from specified one to specified other one
 	while (*string != 0)
 	{
 		if (*string == character)
@@ -39,7 +35,6 @@ void strcharsreplace(char *string, char character, char replace_to)
 
 static void validate_and_calc()
 {
-	//Validate and calculate expression from textview
 	GtkTextIter start_iter, end_iter;
 	gtk_text_buffer_get_start_iter(buffer, &start_iter);
 	gtk_text_buffer_get_end_iter(buffer, &end_iter);
@@ -47,13 +42,13 @@ static void validate_and_calc()
 
 	if (strspn(field, "12345678901+-*/.,") != strlen(field))
 	{
-		gtk_text_buffer_set_text(buffer, "Bad expression!", -1);
+		gtk_text_buffer_set_text(buffer, "WTF?!?!", -1);
 		return;
 	}
 	strcharsreplace(field, ',', '.');
 	if (strchrcount(field, '.') > 2)
 	{
-		gtk_text_buffer_set_text(buffer, "Too much dots!", -1);
+		gtk_text_buffer_set_text(buffer, "Too much dots, Dude!", -1);
 		return;
 	}
 
@@ -65,28 +60,27 @@ static void validate_and_calc()
 	}
 	if (!isdigit(operator[1]) or !isdigit(operator[-1]))
 	{
-		char malformed_expression_at_operator[] = {"Malformed expression at 1 operator!"};
-		malformed_expression_at_operator[24] = *operator; ///24 means '1' symbol above. I probably can use strchr()
-		//here, but IDK why I need to do that at (almost) constant string.
+		char malformed_expression_at_operator[] = {"Bad Operation at 1 operator!"};
+		malformed_expression_at_operator[24] = *operator;
 		gtk_text_buffer_set_text(buffer, malformed_expression_at_operator, -1);
 		return;
 	}
 	char op = *operator;
 	*operator= 0;
-	char *dot1 = strchr(field, '.'); //it may be called as comma. So, 12,34 and 12.34 is same val
+	char *dot1 = strchr(field, '.');
 	char *dot2 = strchr(operator+ 1, '.');
-	double operand1; //need more precision?
+	double operand1;
 	double operand2;
 
 	if (dot1 != NULL)
 	{
 		if (!isdigit(dot1[1]) or !isdigit(dot1[-1]))
 		{
-			gtk_text_buffer_set_text(buffer, "Malformed expression at dot symbol!", -1);
+			gtk_text_buffer_set_text(buffer, "Bad Operation at dot symbol!", -1);
 			return;
 		}
 		*dot1 = 0;
-		operand1 = strtol(field, NULL, 10) + strtol(dot1 + 1, NULL, 10) / pow(10, strlen(dot1 + 1)); //c89 compat
+		operand1 = strtol(field, NULL, 10) + strtol(dot1 + 1, NULL, 10) / pow(10, strlen(dot1 + 1));
 	}
 	else
 	{
@@ -97,11 +91,11 @@ static void validate_and_calc()
 	{
 		if (!isdigit(dot2[1]) or !isdigit(dot2[-1]))
 		{
-			gtk_text_buffer_set_text(buffer, "Malformed expression at dot symbol!", -1);
+			gtk_text_buffer_set_text(buffer, "Bad Operation at dot symbol!", -1);
 			return;
 		}
 		*dot2 = 0;
-		operand2 = strtol(operator+ 1, NULL, 10) + strtol(dot2 + 1, NULL, 10) / pow(10, strlen(dot2 + 1)); //c89 compat
+		operand2 = strtol(operator+ 1, NULL, 10) + strtol(dot2 + 1, NULL, 10) / pow(10, strlen(dot2 + 1));
 	}
 	else
 	{
@@ -133,7 +127,7 @@ static void validate_and_calc()
 		return;
 	}
 
-	char result_str[FLOAT_TEXT_WIDTH]; //float precision width. I don't even know any reason to increase it.
+	char result_str[FLOAT_TEXT_WIDTH];
 	memset(result_str, 0, FLOAT_TEXT_WIDTH);
 	snprintf(result_str, FLOAT_TEXT_WIDTH, "%g", result);
 	gtk_text_buffer_set_text(buffer, result_str, (gint)strlen(result_str));
@@ -158,7 +152,7 @@ static gboolean key_event(GtkWidget *widget, GdkEventKey *event, gpointer data)
 static void add_number(unsigned char number)
 {
 	char insert[2] = {0, 0};
-	insert[0] = number + (char)'0'; //KEK2016!
+	insert[0] = number + (char)'0';
 	gtk_text_buffer_insert_at_cursor(buffer, insert, 1);
 }
 
@@ -218,7 +212,7 @@ static void button_exec(GtkWidget *widget, unsigned char *action_num)
 		validate_and_calc();
 		break;
 	case BUTTON_INFO:
-		gtk_text_buffer_set_text(buffer, "github.com/xdevelnet", -1);
+		gtk_text_buffer_set_text(buffer, "github.com/iotahacodes", -1);
 		break;
 	default:
 		g_printerr("%d", *action_num);
@@ -237,9 +231,9 @@ GtkWidget *place_and_bind_button(const gchar *btn_label, void(*handler), gpointe
 static void activate(GtkApplication *app, gpointer user_data)
 {
 	GtkWidget *window = gtk_application_window_new(app);
-	gtk_window_set_title(GTK_WINDOW(window), "n0calc");
+	gtk_window_set_title(GTK_WINDOW(window), "GTKalc");
 	gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
-	//gtk_window_set_default_size(GTK_WINDOW(window), 550, 300); useless if u're using set resizable
+	gtk_window_set_default_size(GTK_WINDOW(window), 200, 250);
 
 	gtk_container_set_border_width(GTK_CONTAINER(window), 3);
 
@@ -268,7 +262,7 @@ static void activate(GtkApplication *app, gpointer user_data)
 	gtk_widget_set_margin_top(textview, 5);
 	gtk_container_add(GTK_CONTAINER(scrolled), textview);
 
-	GtkWidget *button = gtk_button_new_with_label("Quit");
+	GtkWidget *button = gtk_button_new_with_label("Exit");
 	g_signal_connect_swapped(button, "clicked", G_CALLBACK(gtk_widget_destroy), window);
 	g_signal_connect(window, "key-press-event", G_CALLBACK(key_event), NULL);
 	gtk_grid_attach(GTK_GRID(grid), button, 0, 1, 1, 1);

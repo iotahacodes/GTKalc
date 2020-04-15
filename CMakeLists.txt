@@ -9,9 +9,6 @@ include_directories(${GTK3_INCLUDE_DIRS})
 link_directories(${GTK3_LIBRARY_DIRS})
 add_definitions(${GTK3_CFLAGS_OTHER})
 
-set(SOURCE_FILES
-        main.c buttons.h)
-
+set(SOURCE_FILES main.c buttons.h)
 add_executable(GTKalc ${SOURCE_FILES})
-
 target_link_libraries(GTKalc ${GTK3_LIBRARIES} m)
